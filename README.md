@@ -8,14 +8,15 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 
 # How to use this package ?
 
-- Add the package into your project
+- Add the package into your project.
 
   **Example** : packages.yml
 
   ```bash
     - git: "https://github.com/entechlog/dbt-snow-mask.git"
-    revision: 0.1.0
+    revision: 0.1.1
   ```
+> Please refer to the release version for the latest revision
 
 - Masking is controlled by [meta](https://docs.getdbt.com/reference/resource-properties/meta) in [dbt resource properties](https://docs.getdbt.com/reference/declaring-properties) for sources and models. 
 
