@@ -5,9 +5,9 @@
     {% set masking_policies = [] %}
 
     {% if resource_type == "sources" %}
-        {% set masking_policies = get_masking_policy_list_for_sources(meta_key) %}
+        {% set masking_policies = dbt_snow_mask.get_masking_policy_list_for_sources(meta_key) %}
     {% else %}
-        {% set masking_policies = get_masking_policy_list_for_models(meta_key) %}
+        {% set masking_policies = dbt_snow_mask.get_masking_policy_list_for_models(meta_key) %}
     {% endif %}
 
     {% for masking_policy in masking_policies | unique -%}

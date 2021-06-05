@@ -5,7 +5,10 @@
         {% set database = model.database %}
         {% set schema   = model.schema %}
         {% set materialization = model.config.get("materialized") %}
-        {% set meta_columns = get_meta_objects(model_id,meta_key) %}
+        {% if materialization == "incremental" %}
+            {% set materialization = "table" %}
+        {% endif %}
+        {% set meta_columns = dbt_snow_mask.get_meta_objects(model_id,meta_key) %}
 
         {% set masking_policy_list_sql %}     
             show masking policies in {{database}}.{{schema}};
@@ -21,8 +24,11 @@
 
                 {% for masking_policy_in_db in masking_policy_list['MASKING_POLICY'] %}
                     {% if database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
-                        {{ log(modules.datetime.time() ~ " | applying masking policy           : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper , info=True) }}
+                        {{ log(modules.datetime.time() ~ " | applying masking policy (model)   : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column, info=True) }}
+                        {% set query %}
                         alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{column}} set masking policy  {{database}}.{{schema}}.{{masking_policy_name}};
+                        {% endset %}
+                        {% do run_query(query) %}
                     {% endif %}
                 {% endfor %}
 

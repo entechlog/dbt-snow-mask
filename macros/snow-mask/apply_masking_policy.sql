@@ -3,9 +3,9 @@
     {% if execute %}
 
         {% if resource_type == "sources" %}
-            {{ apply_masking_policy_list_for_sources(meta_key) }}
+            {{ dbt_snow_mask.apply_masking_policy_list_for_sources(meta_key) }}
         {% else %}
-            {{ apply_masking_policy_list_for_models(meta_key) }}
+            {{ dbt_snow_mask.apply_masking_policy_list_for_models(meta_key) }}
         {% endif %}
 
     {% endif %}

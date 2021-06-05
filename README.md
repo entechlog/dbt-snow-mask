@@ -21,7 +21,7 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 
 - Decide you masking policy name and add the key `masking_policy` in the column which has to be masked.
   
-  **Example** : src_sakila.yml
+  **Example** : source.yml
 
   ```bash
   sources:
@@ -34,6 +34,16 @@ This dbt package contains macros that can be (re)used across dbt projects with s
                 masking_policy: temp
   ```
   
+  **Example** : model.yml
+  ```bash
+  models:
+  - name: stg_customer
+    columns:
+      - name: customer_email
+        meta:
+          masking_policy: temp
+  ```
+
 - Create a new `.sql` file with the name `create_masking_policy_<masking-policy-name-from-meta>.sql` and the sql for masking policy definition. Its important for macro to follow this naming standard.
   
   **Example** : create_masking_policy_temp.sql
@@ -41,7 +51,7 @@ This dbt package contains macros that can be (re)used across dbt projects with s
   ```sql
   {% macro create_masking_policy_temp(node_database,node_schema) %}
 
-  CREATE OR REPLACE MASKING POLICY {{node_database}}.{{node_schema}}.temp AS (val string) 
+  CREATE MASKING POLICY IF NOT EXISTS {{node_database}}.{{node_schema}}.temp AS (val string) 
     RETURNS string ->
         CASE WHEN CURRENT_ROLE() IN ('ANALYST') THEN val 
              WHEN CURRENT_ROLE() IN ('DEVELOPER') THEN SHA2(val)
@@ -51,25 +61,36 @@ This dbt package contains macros that can be (re)used across dbt projects with s
   {% endmacro %}
   ```
 
-> Its also good to keep the masking policy ddl organized into a directory say `\macros\snow-mask-ddl`
+> Its also good to keep the masking policy ddl organized in a directory say `\macros\snow-mask-ddl`
 
 - Create the masking policies by running below command
   
-  | Resource Type | Command                                              |
-  | ------------- | ---------------------------------------------------- |
+  | Resource Type | Command                                                                         |
+  | ------------- | ------------------------------------------------------------------------------- |
   | sources       | `dbt run-operation create_masking_policy --args '{"resource_type": "sources"}'` |
   | models        | `dbt run-operation create_masking_policy --args '{"resource_type": "models"}'`  |
 
+- Add post-hook to `dbt_project.yml`
+  
+  ***Example** : dbt_project.yml
+
+  ```bash
+  models:
+  post-hook: 
+    - "{{ dbt_snow_mask.apply_masking_policy() }}"
+  ```
+
 - Apply the masking policy by running below commands
 
-  | Resource Type | Command                         |
-  | ------------- | ------------------------------- |
+  | Resource Type | Command                                                                        |
+  | ------------- | ------------------------------------------------------------------------------ |
   | sources       | `dbt run-operation apply_masking_policy --args '{"resource_type": "sources"}'` |
-  | models        | `dbt run -- model <model-name>` |
-
+  | models        | `dbt run -- model <model-name>`                                                |
+ 
 # Credits
 This package was created using example macros from [Serge](https://getdbt.slack.com/archives/CJN7XRF1B/p1609177817234800)
 
 # Future Enhancements
-- Optimize the macros & reduce the number of lines in each macros
+- Optimize macros & reduce number of lines in macros
 - `apply_masking_policy_list_for_sources` needs changes to find the `materialization` 
+- Add support for `CREATE OR REPLACE MASKING POLICY`. This needs unset to happen before replacing the existing policy to avoid `SQL compilation error: Policy TEMP cannot be dropped/replaced as it is associated with one or more entities.` error

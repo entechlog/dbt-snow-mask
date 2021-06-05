@@ -9,7 +9,7 @@
         {% set resource_type = node.resource_type | string %}
         {% set materialization = "table" %}
 
-        {% set meta_columns = get_meta_objects(unique_id,meta_key,resource_type) %}
+        {% set meta_columns = dbt_snow_mask.get_meta_objects(unique_id,meta_key,resource_type) %}
 
         {% set masking_policy_list_sql %}     
             show masking policies in {{database}}.{{schema}};
