@@ -43,11 +43,10 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 
 - Create the masking policies by running below command
   
-  | Resource Type      | Command                                              |
-  | ------------------ | ---------------------------------------------------- |
-  | sources and models | `dbt run-operation create_masking_policy()`          |
-  | sources            | `dbt run-operation create_masking_policy("sources")` |
-  | models             | `dbt run-operation create_masking_policy("models")`  |
+  | Resource Type | Command                                              |
+  | ------------- | ---------------------------------------------------- |
+  | sources       | `dbt run-operation create_masking_policy("sources")` |
+  | models        | `dbt run-operation create_masking_policy("models")`  |
 
 - Apply the masking policy by running below commands
 
@@ -56,4 +55,4 @@ This dbt package contains macros that can be (re)used across dbt projects with s
   | models        | `dbt run -- model <model-name>` |
 
 # Credits
-This package was created using example macros from [Serge] (https://getdbt.slack.com/archives/CJN7XRF1B/p1609177817234800)
+This package was created using example macros from [Serge](https://getdbt.slack.com/archives/CJN7XRF1B/p1609177817234800)
