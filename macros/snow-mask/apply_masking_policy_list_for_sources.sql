@@ -1,4 +1,4 @@
-{% macro apply_masking_policy_list_for_sources(meta_key) %}
+{% macro apply_masking_policy_list_for_sources(meta_key,operation_type="apply") %}
 
     {% for node in graph.sources.values() -%}
         
@@ -25,9 +25,13 @@
 
                 {% for masking_policy_in_db in masking_policy_list['MASKING_POLICY'] %}
                     {% if database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
-                        {{ log(modules.datetime.time() ~ " | applying masking policy (source)  : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ name ~ '.' ~ column, info=True) }}
+                        {{ log(modules.datetime.time() ~ " | " ~ operation_type ~ "ing masking policy to source : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ name ~ '.' ~ column, info=True) }}
                         {% set query %}
-                        alter {{materialization}}  {{database}}.{{schema}}.{{name}} modify column  {{column}} set masking policy  {{database}}.{{schema}}.{{masking_policy_name}}
+                            {% if operation_type == "apply" %}
+                                alter {{materialization}}  {{database}}.{{schema}}.{{name}} modify column  {{column}} set masking policy  {{database}}.{{schema}}.{{masking_policy_name}}
+                            {% elif operation_type == "unapply" %}
+                                alter {{materialization}}  {{database}}.{{schema}}.{{name}} modify column  {{column}} unset masking policy
+                            {% endif %}
                         {% endset %}
                         {% do run_query(query) %}
                     {% endif %}
