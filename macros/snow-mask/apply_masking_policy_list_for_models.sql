@@ -1,5 +1,7 @@
-{% macro apply_masking_policy_list_for_models(meta_key) %}
+{% macro apply_masking_policy_list_for_models(meta_key,operation_type="apply") %}
 
+    {% if operation_type == "apply" %}
+    
         {% set model_id = model.unique_id | string %}
         {% set alias    = model.alias %}    
         {% set database = model.database %}
@@ -24,7 +26,7 @@
 
                 {% for masking_policy_in_db in masking_policy_list['MASKING_POLICY'] %}
                     {% if database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
-                        {{ log(modules.datetime.time() ~ " | applying masking policy (model)   : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column, info=True) }}
+                        {{ log(modules.datetime.time() ~ " | " ~ operation_type ~ "ing masking policy to model  : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column, info=True) }}
                         {% set query %}
                         alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{column}} set masking policy  {{database}}.{{schema}}.{{masking_policy_name}};
                         {% endset %}
@@ -35,4 +37,35 @@
                {% endif %}
         {% endfor %}
     
-    {% endmacro %}
+    {% elif operation_type == "unapply" %}
+
+        {% for node in graph.nodes.values() -%}
+
+            {% set database = node.database | string %}
+            {% set schema   = node.schema | string %}
+            {% set node_unique_id = node.unique_id | string %}
+            {% set node_resource_type = node.resource_type | string %}
+            {% set materialization = node.config.materialized | string %}
+            {% set alias    = node.alias %}
+
+            {% set meta_columns = dbt_snow_mask.get_meta_objects(node_unique_id,meta_key,node_resource_type) %}
+
+            {%- for meta_tuple in meta_columns if meta_columns | length > 0 %}
+                {% set column   = meta_tuple[0] %}
+                {% set masking_policy_name  = meta_tuple[1] %}
+
+                {% if masking_policy_name is not none %}
+                    {{ log(modules.datetime.time() ~ " | " ~ operation_type ~ "ing masking policy to model  : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column, info=True) }}
+                    {% set query %}
+                        alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{column}} unset masking policy
+                    {% endset %}
+                    {% do run_query(query) %}
+                {% endif %}
+            
+            {% endfor %}
+
+        {% endfor %}
+
+    {% endif %}
+
+{% endmacro %}
