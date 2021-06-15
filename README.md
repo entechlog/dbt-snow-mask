@@ -22,8 +22,8 @@ This dbt package contains macros that can be (re)used across dbt projects with s
   ```
 
   ```bash
-      - package: entechlog/dbt_snow_mask
-        version: 0.1.2
+     - package: entechlog/dbt_snow_mask
+       version: 0.1.2
   ```
 
 > - Packages can be added to your project using either of these options
