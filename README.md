@@ -17,8 +17,8 @@ This dbt package contains macros that can be (re)used across dbt projects with s
   **Example** : packages.yml
 
   ```bash
-    - git: "https://github.com/entechlog/dbt-snow-mask.git"
-      revision: 0.1.2
+     - git: "https://github.com/entechlog/dbt-snow-mask.git"
+       revision: 0.1.2
   ```
 
   ```bash
