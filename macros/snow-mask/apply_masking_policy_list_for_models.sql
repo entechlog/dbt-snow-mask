@@ -46,6 +46,9 @@
             {% set node_unique_id = node.unique_id | string %}
             {% set node_resource_type = node.resource_type | string %}
             {% set materialization = node.config.materialized | string %}
+            {% if materialization == "incremental" %}
+                {% set materialization = "table" %}
+            {% endif %}
             {% set alias    = node.alias %}
 
             {% set meta_columns = dbt_snow_mask.get_meta_objects(node_unique_id,meta_key,node_resource_type) %}
