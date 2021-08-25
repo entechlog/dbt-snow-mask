@@ -14,7 +14,7 @@
         {% set current_database = masking_policy[0] | string  %}
         {% set current_schema = masking_policy[1] | string  %}
         {% set current_policy_name = masking_policy[2] | string  %}
-        {{ log(modules.datetime.time() ~ " | creating masking policy           : " ~ current_database|upper ~ '.' ~ current_schema|upper ~ '.' ~ current_policy_name|upper , info=True) }}
+        {{ log(modules.datetime.datetime.now().strftime("%H:%M:%S") ~ " | creating masking policy           : " ~ current_database|upper ~ '.' ~ current_schema|upper ~ '.' ~ current_policy_name|upper , info=True) }}
         {% set call_masking_policy_macro = context["create_masking_policy_" | string ~ current_policy_name | string]  %}
         {{ run_query(call_masking_policy_macro(current_database, current_schema)) }}
     {% endfor %}
