@@ -18,12 +18,12 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 
   ```bash
      - git: "https://github.com/entechlog/dbt-snow-mask.git"
-       revision: 0.1.2
+       revision: 0.1.5
   ```
 
   ```bash
      - package: entechlog/dbt_snow_mask
-       version: 0.1.2
+       version: 0.1.5
   ```
 
 > - Packages can be added to your project using either of these options
@@ -134,7 +134,6 @@ SELECT *
 
 # Future Enhancements & Limitations
 - Optimize macros & reduce number of lines in macros
-- `apply_masking_policy_list_for_sources` needs changes to find the `materialization`, Currently this supports table sources only 
 - `unapply_masking_policy` has to be executed before running masking policy definitions with `CREATE OR REPLACE MASKING POLICY`
 
 # Credits
