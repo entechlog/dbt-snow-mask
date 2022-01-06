@@ -1,7 +1,7 @@
 name: 'dbt_snow_mask'
 version: '1.0.0'
 
-require-dbt-version: [">=0.18.0", "<=0.22.0"]
+require-dbt-version: [">=0.18.0", "<1.1.0"]
 config-version: 2
 
 target-path: "target"
