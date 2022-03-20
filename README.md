@@ -3,9 +3,9 @@
 - [How to apply masking policy ?](#how-to-apply-masking-policy-)
 - [How to remove masking policy ?](#how-to-remove-masking-policy-)
 - [How to validate masking policy ?](#how-to-validate-masking-policy-)
-- [Future Enhancements & Limitations](#future-enhancements--limitations)
 - [Credits](#credits)
 - [References](#references)
+- [Contributions](#contributions)
 
 # Overview
 This dbt package contains macros that can be (re)used across dbt projects with snowflake. `dbt_snow_mask` will help to apply [Dynamic Data Masking](https://docs.snowflake.com/en/user-guide/security-column-ddm-use.html) using [dbt meta](https://docs.getdbt.com/reference/resource-properties/meta).
@@ -18,16 +18,25 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 
   ```bash
      - git: "https://github.com/entechlog/dbt-snow-mask.git"
-       revision: 0.1.5
+       revision: 0.1.7
   ```
 
   ```bash
      - package: entechlog/dbt_snow_mask
-       version: 0.1.5
+       version: 0.1.7
   ```
 
-> - Packages can be added to your project using either of these options
-> - Please refer to the release version of this repo/dbt hub for the latest revision
+> ✅ Packages can be added to your project using either of above options  
+> ✅ Please refer to the release version of this repo/dbt hub for the latest revision
+
+- This package uses [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) package. When using `dbt_snow_mask` in your project, please install [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) as well. You will get an error if you attempt to use this package without installing `dbt_snow_mask`
+
+  ```bash
+     - package: dbt-labs/dbt_utils
+       version: 0.8.2
+  ```
+
+> ✅ Please refer to the release version in dbt hub for the latest revision
 
 # How to apply masking policy ?
 
@@ -86,6 +95,14 @@ This dbt package contains macros that can be (re)used across dbt projects with s
   | sources       | `dbt run-operation create_masking_policy --args '{"resource_type": "sources"}'` |
   | models        | `dbt run-operation create_masking_policy --args '{"resource_type": "models"}'`  |
 
+- Alternatively, you can also create the masking policies by specifying below `on-run-start` in your `dbt_project.yml`
+  
+  ```bash
+  on-run-end:
+    - "{{ dbt_snow_mask.create_masking_policy(resource_type=models)}}"
+    - "{{ dbt_snow_mask.create_masking_policy(resource_type=sources)}}"
+  ```
+
 - Add post-hook to `dbt_project.yml`
   
   **Example** : dbt_project.yml
@@ -132,13 +149,12 @@ SELECT *
   FROM TABLE(INFORMATION_SCHEMA.POLICY_REFERENCES(POLICY_NAME => '<database-name>.<schema-name>.<masking-policy-name>'));
 ```
 
-# Future Enhancements & Limitations
-- Optimize macros & reduce number of lines in macros
-- `unapply_masking_policy` has to be executed before running masking policy definitions with `CREATE OR REPLACE MASKING POLICY`
-
 # Credits
-This package was created using examples from [Serge](https://www.linkedin.com/in/serge-gekker-912b9928/) and [Matt](https://www.linkedin.com/in/matt-winkler-4024263a/)
+This package was created using examples from [Serge](https://www.linkedin.com/in/serge-gekker-912b9928/) and [Matt](https://www.linkedin.com/in/matt-winkler-4024263a/). Please see the [contributors](https://github.com/entechlog/dbt-snow-mask/graphs/contributors) for full list of users who have contributed to this project.
 
 # References
 - https://docs.snowflake.com/en/user-guide/security-column-ddm-intro.html
 - https://getdbt.slack.com/archives/CJN7XRF1B/p1609177817234800
+
+# Contributions
+Contributions to this package are welcomed. Please create issues for bugs or feature requests for enhancement ideas or PRs for any enhancement contributions.
