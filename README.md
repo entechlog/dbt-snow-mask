@@ -29,7 +29,7 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 > ✅ Packages can be added to your project using either of above options  
 > ✅ Please refer to the release version of this repo/dbt hub for the latest revision
 
-- This package uses [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) package. When using `dbt_snow_mask` in your project, please install [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) as well. You will get an error if you attempt to use this package without also installing `dbt_snow_mask`
+- This package uses [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) package. When using `dbt_snow_mask` in your project, please install [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) as well. You will get an error if you attempt to use this package without installing `dbt_snow_mask`
 
   ```bash
      - package: dbt-labs/dbt_utils
@@ -157,4 +157,4 @@ This package was created using examples from [Serge](https://www.linkedin.com/in
 - https://getdbt.slack.com/archives/CJN7XRF1B/p1609177817234800
 
 # Contributions
-Contributions to this package are welcomed. Please create issues for bugs or feature requests or PRs for any enhancements.
+Contributions to this package are welcomed. Please create issues for bugs or feature requests for enhancement ideas or PRs for any enhancement contributions.
