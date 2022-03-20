@@ -26,7 +26,7 @@ This dbt package contains macros that can be (re)used across dbt projects with s
        version: 0.1.7
   ```
 
-> ✅ Packages can be added to your project using either of above options
+> ✅ Packages can be added to your project using either of above options  
 > ✅ Please refer to the release version of this repo/dbt hub for the latest revision
 
 - This package uses [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) package. When using `dbt_snow_mask` in your project, please install [dbt_utils](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/) as well. You will get an error if you attempt to use this package without also installing `dbt_snow_mask`
