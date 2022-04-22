@@ -17,16 +17,18 @@ clean-targets:
     - "logs"
 
 vars:
-  use_common_masking_policy_db: True
-  common_masking_policy_db: DEMO_DB
-  common_masking_policy_schema: GDPR
-  
+  use_common_masking_policy_db: "True"
+  common_masking_policy_db: "DEMO_DB"
+  common_masking_policy_schema: "GDPR"
+
 seeds:
   dbt_snow_mask_integration_tests:
     sakila:
       schema: raw_sakila
 
 models:
+  pre-hook:
+    - "{{ dbt_snow_mask.create_masking_policy('models')}}"
   post-hook: 
     - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
   
@@ -36,7 +38,6 @@ models:
       schema: staging
 
 on-run-start:
-  - "{{ dbt_snow_mask.create_masking_policy('models')}}"
   - "{{ dbt_snow_mask.create_masking_policy('sources')}}"
 
 on-run-end:

@@ -1,5 +1,6 @@
 - [Overview](#overview)
 - [Installation Instructions](#installation-instructions)
+- [How to configure database and schema for the masking policy ?](#how-to-configure-database-and-schema-for-the-masking-policy-)
 - [How to apply masking policy ?](#how-to-apply-masking-policy-)
 - [How to remove masking policy ?](#how-to-remove-masking-policy-)
 - [How to validate masking policy ?](#how-to-validate-masking-policy-)
@@ -40,6 +41,15 @@ This dbt package contains macros that can be (re)used across dbt projects with s
   ```
 
 > ✅ Please refer to the release version in dbt hub for the latest revision
+
+
+# How to configure database and schema for the masking policy ?
+
+By default this process creates the masking policies in same directory as the database objects. You can change this default behavior by using following parameters in your `dbt_project.yml` 
+
+* `use_common_masking_policy_db` (optional): Flag to enable the usage of a common db/schema for all masking policies. Valid values are “True” OR "False"
+* `common_masking_policy_db` (optional): The database name for creating masking policies
+* `common_masking_policy_schema` (optional): The schema name for creating masking policies
 
 # How to apply masking policy ?
 

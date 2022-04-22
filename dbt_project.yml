@@ -8,3 +8,8 @@ target-path: "target"
 clean-targets: ["target", "dbt_modules"]
 macro-paths: ["macros"]
 log-path: "logs"
+
+vars:
+  use_common_masking_policy_db: "False"
+  common_masking_policy_db: 
+  common_masking_policy_schema: 
