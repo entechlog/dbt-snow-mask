@@ -16,10 +16,10 @@ clean-targets:
     - "dbt_packages"
     - "logs"
 
-vars:
-  use_common_masking_policy_db: "True"
-  common_masking_policy_db: "DEMO_DB"
-  common_masking_policy_schema: "GDPR"
+#vars:
+#  use_common_masking_policy_db: "True"
+#  common_masking_policy_db: "DEMO_DB"
+#  common_masking_policy_schema: "COMPLIANCE"
 
 seeds:
   dbt_snow_mask_integration_tests:
@@ -31,6 +31,7 @@ models:
     - "{{ dbt_snow_mask.create_masking_policy('models')}}"
   post-hook: 
     - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
+#    - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
   
   dbt_snow_mask_integration_tests:
     staging:
@@ -38,7 +39,7 @@ models:
       schema: staging
 
 on-run-start:
-  - "{{ dbt_snow_mask.create_masking_policy('sources')}}"
+#  - "{{ dbt_snow_mask.create_masking_policy('sources')}}"
 
 on-run-end:
-  - "{{ dbt_snow_mask.apply_masking_policy('sources')}}"
+#  - "{{ dbt_snow_mask.apply_masking_policy('sources')}}"

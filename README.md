@@ -6,6 +6,7 @@
 - [How to validate masking policy ?](#how-to-validate-masking-policy-)
 - [Process flow](#process-flow)
   - [Create masking policy](#create-masking-policy)
+  - [Apply masking policy](#apply-masking-policy)
 - [Known Errors and Solutions](#known-errors-and-solutions)
 - [Credits](#credits)
 - [References](#references)
@@ -50,6 +51,15 @@ By default this process creates the masking policies in same directory as the da
 * `use_common_masking_policy_db` (optional): Flag to enable the usage of a common db/schema for all masking policies. Valid values are “True” OR "False"
 * `common_masking_policy_db` (optional): The database name for creating masking policies
 * `common_masking_policy_schema` (optional): The schema name for creating masking policies
+
+**Example** : var block in dbt_project.yml
+
+```yaml
+vars:
+  use_common_masking_policy_db: "True"
+  common_masking_policy_db: "DEMO_DB"
+  common_masking_policy_schema: "COMPLIANCE"
+```
 
 # How to apply masking policy ?
 
@@ -107,7 +117,7 @@ By default this process creates the masking policies in same directory as the da
   | sources       | `dbt run-operation create_masking_policy --args '{"resource_type": "sources"}'` |
   | models        | `dbt run-operation create_masking_policy --args '{"resource_type": "models"}'`  |
 
-- Alternatively, you can also create the masking policies by specifying below `on-run-start` in your `dbt_project.yml`
+- Alternatively, you can also create the masking policies by specifying `pre-hook` OR `on-run-start` in your `dbt_project.yml`
   
   ```yaml
   on-run-start:
@@ -122,7 +132,7 @@ By default this process creates the masking policies in same directory as the da
   | sources       | `dbt run-operation apply_masking_policy --args '{"resource_type": "sources"}'` |
   | models        | `dbt run -- model <model-name>`                                                |
 
-- Alternatively, you can also apply the masking policies by specifying below `post-hook` to `dbt_project.yml`
+- Alternatively, you can also apply the masking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
   
   **Example** : dbt_project.yml
 
@@ -140,6 +150,16 @@ By default this process creates the masking policies in same directory as the da
   | ------------- | -------------------------------------------------------------------------------- |
   | sources       | `dbt run-operation unapply_masking_policy --args '{"resource_type": "sources"}'` |
   | models        | `dbt run-operation unapply_masking_policy --args '{"resource_type": "models"}'`  |
+
+- Alternatively, you can also apply the unmasking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
+  
+  **Example** : dbt_project.yml
+
+  ```yaml
+  models:
+    post-hook: 
+      - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
+  ```
 
 # How to validate masking policy ?
 
@@ -164,11 +184,22 @@ SELECT *
 
 ```mermaid
 graph TD
-    A[create_masking_policy] --> |resource_type=sources| B[get_masking_policy_list_for_sources]
-    A[create_masking_policy] --> |resource_type=models| C[get_masking_policy_list_for_models]
+    A[create_masking_policy] --> |resource_type='sources',meta_key='masking_policy'| B[get_masking_policy_list_for_sources]
+    A[create_masking_policy] --> |resource_type='models',meta_key='masking_policy'| C[get_masking_policy_list_for_models]
     B --> |database, schema| D[create_schema]
     C --> |database, schema| D[create_schema]
-    D --> |meta_key, ie policy from yaml| E[call_masking_policy_macro]
+    D --> |policy_name| E[call_masking_policy_macro]
+```
+
+## Apply masking policy
+
+```mermaid
+graph TD
+    A[apply_masking_policy] --> |resource_type='sources',meta_key='masking_policy'| B[apply_masking_policy_list_for_sources]
+    A[apply_masking_policy] --> |resource_type='models',meta_key='masking_policy'| C[apply_masking_policy_list_for_models]
+    B --> |meta_key| D[confirm masking policy is avaliable in db]
+    C --> |meta_key| D[confirm masking policy is avaliable in db]
+    D --> E[alter statement to set masking policy]
 ```
 
 # Known Errors and Solutions
