@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: stg_customer
+    columns:
+      - name: email
+        meta:
+          masking_policy: mp_encrypt_pii

@@ -132,3 +132,13 @@ dmypy.json
 target/
 dbt_modules/
 logs/
+profiles.yml
+dbt_packages/
+
+# Passwords 
+*.pem
+*.pub
+*my_password.txt
+
+#Postgres
+.user.yml

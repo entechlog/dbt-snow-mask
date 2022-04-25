@@ -1,8 +1,13 @@
 - [Overview](#overview)
 - [Installation Instructions](#installation-instructions)
+- [How to configure database and schema for the masking policy ?](#how-to-configure-database-and-schema-for-the-masking-policy-)
 - [How to apply masking policy ?](#how-to-apply-masking-policy-)
 - [How to remove masking policy ?](#how-to-remove-masking-policy-)
 - [How to validate masking policy ?](#how-to-validate-masking-policy-)
+- [Process flow](#process-flow)
+  - [Create masking policy](#create-masking-policy)
+  - [Apply masking policy](#apply-masking-policy)
+- [Known Errors and Solutions](#known-errors-and-solutions)
 - [Credits](#credits)
 - [References](#references)
 - [Contributions](#contributions)
@@ -38,6 +43,24 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 
 > ✅ Please refer to the release version in dbt hub for the latest revision
 
+
+# How to configure database and schema for the masking policy ?
+
+By default this process creates the masking policies in same directory as the database objects. You can change this default behavior by using following parameters in your `dbt_project.yml` 
+
+* `use_common_masking_policy_db` (optional): Flag to enable the usage of a common db/schema for all masking policies. Valid values are “True” OR "False"
+* `common_masking_policy_db` (optional): The database name for creating masking policies
+* `common_masking_policy_schema` (optional): The schema name for creating masking policies
+
+**Example** : var block in dbt_project.yml
+
+```yaml
+vars:
+  use_common_masking_policy_db: "True"
+  common_masking_policy_db: "DEMO_DB"
+  common_masking_policy_schema: "COMPLIANCE"
+```
+
 # How to apply masking policy ?
 
 - Masking is controlled by [meta](https://docs.getdbt.com/reference/resource-properties/meta) in [dbt resource properties](https://docs.getdbt.com/reference/declaring-properties) for sources and models. 
@@ -46,36 +69,36 @@ This dbt package contains macros that can be (re)used across dbt projects with s
   
   **Example** : source.yml
 
-  ```bash
+  ```yaml
   sources:
-    - name: sakila
+    - name: raw_sakila
       tables:
-        - name: actor
+        - name: customer
           columns:
-            - name: FIRST_NAME
+            - name: first_name
               meta:
-                  masking_policy: temp
+                  masking_policy: mp_encrypt_pii
   ```
   
   **Example** : model.yml
-  ```bash
+
+  ```yaml
   models:
     - name: stg_customer
       columns:
-        - name: customer_last_name
-        - name: customer_email
+        - name: email
           meta:
-            masking_policy: temp
+            masking_policy: mp_encrypt_pii
   ```
 
 - Create a new `.sql` file with the name `create_masking_policy_<masking-policy-name-from-meta>.sql` and the sql for masking policy definition. Its important for macro to follow this naming standard.
   
-  **Example** : create_masking_policy_temp.sql
+  **Example** : create_masking_policy_mp_encrypt_pii.sql
 
   ```sql
-  {% macro create_masking_policy_temp(node_database,node_schema) %}
+  {% macro create_masking_policy_mp_encrypt_pii(node_database,node_schema) %}
 
-  CREATE MASKING POLICY IF NOT EXISTS {{node_database}}.{{node_schema}}.temp AS (val string) 
+  CREATE MASKING POLICY IF NOT EXISTS {{node_database}}.{{node_schema}}.mp_encrypt_pii AS (val string) 
     RETURNS string ->
         CASE WHEN CURRENT_ROLE() IN ('ANALYST') THEN val 
              WHEN CURRENT_ROLE() IN ('DEVELOPER') THEN SHA2(val)
@@ -88,48 +111,55 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 > Its good to keep the masking policy ddl organized in a directory say `\macros\snow-mask-ddl`
 
 - Create the masking policies by running below command  
-
   
   | Resource Type | Command                                                                         |
   | ------------- | ------------------------------------------------------------------------------- |
   | sources       | `dbt run-operation create_masking_policy --args '{"resource_type": "sources"}'` |
   | models        | `dbt run-operation create_masking_policy --args '{"resource_type": "models"}'`  |
 
-- Alternatively, you can also create the masking policies by specifying below `on-run-start` in your `dbt_project.yml`
+- Alternatively, you can also create the masking policies by specifying `pre-hook` OR `on-run-start` in your `dbt_project.yml`
   
-  ```bash
-  on-run-end:
-    - "{{ dbt_snow_mask.create_masking_policy(resource_type=models)}}"
-    - "{{ dbt_snow_mask.create_masking_policy(resource_type=sources)}}"
-  ```
-
-- Add post-hook to `dbt_project.yml`
-  
-  **Example** : dbt_project.yml
-
-  ```bash
-  models:
-    post-hook: 
-      - "{{ dbt_snow_mask.apply_masking_policy() }}"
+  ```yaml
+  on-run-start:
+    - "{{ dbt_snow_mask.create_masking_policy('models')}}"
+    - "{{ dbt_snow_mask.create_masking_policy('sources')}}"
   ```
 
 - Apply the masking policy by running below commands  
-
 
   | Resource Type | Command                                                                        |
   | ------------- | ------------------------------------------------------------------------------ |
   | sources       | `dbt run-operation apply_masking_policy --args '{"resource_type": "sources"}'` |
   | models        | `dbt run -- model <model-name>`                                                |
 
+- Alternatively, you can also apply the masking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
+  
+  **Example** : dbt_project.yml
+
+  ```yaml
+  models:
+    post-hook: 
+      - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
+  ```
+
 # How to remove masking policy ?
 
 - Remove the masking policy applied by this package by running below commands  
-
 
   | Resource Type | Command                                                                          |
   | ------------- | -------------------------------------------------------------------------------- |
   | sources       | `dbt run-operation unapply_masking_policy --args '{"resource_type": "sources"}'` |
   | models        | `dbt run-operation unapply_masking_policy --args '{"resource_type": "models"}'`  |
+
+- Alternatively, you can also apply the unmasking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
+  
+  **Example** : dbt_project.yml
+
+  ```yaml
+  models:
+    post-hook: 
+      - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
+  ```
 
 # How to validate masking policy ?
 
@@ -148,6 +178,34 @@ USE SCHEMA INFORMATION_SCHEMA;
 SELECT *
   FROM TABLE(INFORMATION_SCHEMA.POLICY_REFERENCES(POLICY_NAME => '<database-name>.<schema-name>.<masking-policy-name>'));
 ```
+
+# Process flow
+## Create masking policy
+
+```mermaid
+graph TD
+    A[create_masking_policy] --> |resource_type='sources',meta_key='masking_policy'| B[get_masking_policy_list_for_sources]
+    A[create_masking_policy] --> |resource_type='models',meta_key='masking_policy'| C[get_masking_policy_list_for_models]
+    B --> |database, schema| D[create_schema]
+    C --> |database, schema| D[create_schema]
+    D --> |policy_name| E[call_masking_policy_macro]
+```
+
+## Apply masking policy
+
+```mermaid
+graph TD
+    A[apply_masking_policy] --> |resource_type='sources',meta_key='masking_policy'| B[apply_masking_policy_list_for_sources]
+    A[apply_masking_policy] --> |resource_type='models',meta_key='masking_policy'| C[apply_masking_policy_list_for_models]
+    B --> |meta_key| D[confirm masking policy is avaliable in db]
+    C --> |meta_key| D[confirm masking policy is avaliable in db]
+    D --> E[alter statement to set masking policy]
+```
+
+# Known Errors and Solutions
+| Error                                                               | Solution                                                                 |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| dict object' has no attribute 'create_masking_policy_mp_encrypt_pi' | Typo in yaml for masking_policy, mp_encrypt_pi instead of mp_encrypt_pii |
 
 # Credits
 This package was created using examples from [Serge](https://www.linkedin.com/in/serge-gekker-912b9928/) and [Matt](https://www.linkedin.com/in/matt-winkler-4024263a/). Please see the [contributors](https://github.com/entechlog/dbt-snow-mask/graphs/contributors) for full list of users who have contributed to this project.

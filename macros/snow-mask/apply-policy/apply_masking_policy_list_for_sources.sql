@@ -18,8 +18,19 @@
 
         {% set meta_columns = dbt_snow_mask.get_meta_objects(unique_id,meta_key,resource_type) %}
 
+        {% set masking_policy_db = model.database %}
+        {% set masking_policy_schema = model.schema %}
+		
+        {# Override the database and schema name when use common_masking_policy_db flag is set #}
+        {%- if (var('use_common_masking_policy_db', 'False')|upper == 'TRUE') or (var('use_common_masking_policy_db', 'False')|upper == 'YES') -%}
+            {% if var('common_masking_policy_db') and var('common_masking_policy_schema') %}
+                {% set masking_policy_db = var('common_masking_policy_db') | string  %}
+                {% set masking_policy_schema = var('common_masking_policy_schema') | string  %}
+            {% endif %}
+        {% endif %}
+
         {% set masking_policy_list_sql %}
-            show masking policies in {{database}}.{{schema}};
+            show masking policies in {{masking_policy_db}}.{{masking_policy_schema}};
             select $3||'.'||$4||'.'||$2 as masking_policy from table(result_scan(last_query_id()));
         {% endset %}
 
@@ -31,11 +42,11 @@
                 {% set masking_policy_list = dbt_utils.get_query_results_as_dict(masking_policy_list_sql) %}
 
                 {% for masking_policy_in_db in masking_policy_list['MASKING_POLICY'] %}
-                    {% if database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
-                        {{ log(modules.datetime.datetime.now().strftime("%H:%M:%S") ~ " | " ~ operation_type ~ "ing masking policy to source : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ identifier ~ '.' ~ column, info=True) }}
+                    {% if masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
+                        {{ log(modules.datetime.datetime.now().strftime("%H:%M:%S") ~ " | " ~ operation_type ~ "ing masking policy to source : " ~ masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ identifier ~ '.' ~ column, info=True) }}
                         {% set query %}
                             {% if operation_type == "apply" %}
-                                alter {{materialization}}  {{database}}.{{schema}}.{{identifier}} modify column  {{column}} set masking policy  {{database}}.{{schema}}.{{masking_policy_name}}
+                                alter {{materialization}}  {{database}}.{{schema}}.{{identifier}} modify column  {{column}} set masking policy  {{masking_policy_db}}.{{masking_policy_schema}}.{{masking_policy_name}}
                             {% elif operation_type == "unapply" %}
                                 alter {{materialization}}  {{database}}.{{schema}}.{{identifier}} modify column  {{column}} unset masking policy
                             {% endif %}

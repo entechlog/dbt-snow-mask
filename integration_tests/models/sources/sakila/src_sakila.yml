@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw_sakila
+    tables:
+      - name: customer
+        columns:
+          - name: first_name
+            meta:
+                masking_policy: mp_encrypt_pii

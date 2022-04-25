@@ -1,10 +1,15 @@
 name: 'dbt_snow_mask'
 version: '1.0.0'
 
-require-dbt-version: [">=0.18.0", "<1.1.0"]
+require-dbt-version: [">=0.18.0"]
 config-version: 2
 
 target-path: "target"
 clean-targets: ["target", "dbt_modules"]
 macro-paths: ["macros"]
 log-path: "logs"
+
+vars:
+  use_common_masking_policy_db: "False"
+  common_masking_policy_db: 
+  common_masking_policy_schema: 
