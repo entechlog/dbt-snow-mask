@@ -20,8 +20,8 @@
 
         {# Use the database and schema for the source node: #}
         {#     In the apple for models variant of this file it instead uses the model.database/schema metadata #}
-        {% set masking_policy_db = database %}
-        {% set masking_policy_schema = schema %}
+        {% set masking_policy_db = node.database %}
+        {% set masking_policy_schema = node.schema %}
 		
         {# Override the database and schema name when use common_masking_policy_db flag is set #}
         {%- if (var('use_common_masking_policy_db', 'False')|upper == 'TRUE') or (var('use_common_masking_policy_db', 'False')|upper == 'YES') -%}
