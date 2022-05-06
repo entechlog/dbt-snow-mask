@@ -15,11 +15,18 @@
         {% set masking_policy_db = model.database %}
         {% set masking_policy_schema = model.schema %}
 		
-        {# Override the database and schema name when use common_masking_policy_db flag is set #}
-        {%- if (var('use_common_masking_policy_db', 'False')|upper == 'TRUE') or (var('use_common_masking_policy_db', 'False')|upper == 'YES') -%}
-            {% if var('common_masking_policy_db') and var('common_masking_policy_schema') %}
-                {% set masking_policy_db = var('common_masking_policy_db') | string  %}
+        {# Override the database and schema name when use_common_masking_policy_db flag is set #}
+        {# Override the schema name (in the current_database) when use_common_masking_policy_schema flag is set #}
+        {%- if (var('use_common_masking_policy_db', 'False')|upper in ['TRUE','YES']) or (var('use_common_masking_policy_schema', 'False')|upper in ['TRUE','YES']) -%}
+            {% if var('common_masking_policy_schema') %}
                 {% set masking_policy_schema = var('common_masking_policy_schema') | string  %}
+
+                {%- if (var('use_common_masking_policy_db', 'False')|upper in ['TRUE','YES']) and (var('use_common_masking_policy_schema', 'False')|upper in ['FALSE','NO']) -%}
+                    {% if var('common_masking_policy_db') %}
+                        {% set masking_policy_db = var('common_masking_policy_db') | string  %}
+                    {% endif %}
+                {% endif %}
+                
             {% endif %}
         {% endif %}
 
@@ -39,7 +46,7 @@
                     {% if masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
                         {{ log(modules.datetime.datetime.now().strftime("%H:%M:%S") ~ " | " ~ operation_type ~ "ing masking policy to model  : " ~ masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column, info=True) }}
                         {% set query %}
-                        alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{column}} set masking policy  {{masking_policy_db}}.{{masking_policy_schema}}.{{masking_policy_name}};
+                        alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{column}} set masking policy {{masking_policy_db}}.{{masking_policy_schema}}.{{masking_policy_name}};
                         {% endset %}
                         {% do run_query(query) %}
                     {% endif %}
