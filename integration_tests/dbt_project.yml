@@ -18,11 +18,11 @@ clean-targets:
 
 # vars:
 #   use_common_masking_policy_db: "True"
-#   common_masking_policy_db: "DATA_WAREHOUSE_PREPROD_DSE3422"
-#   common_masking_policy_schema: "SHARED"
+#   common_masking_policy_db: "DEMO_DB"
+#   common_masking_policy_schema: "COMPLIANCE"
 
 #   use_common_masking_policy_schema_only: "True"
-#   common_masking_policy_schema: "SHARED"
+#   common_masking_policy_schema: "COMPLIANCE"
 
 seeds:
   dbt_snow_mask_integration_tests:
