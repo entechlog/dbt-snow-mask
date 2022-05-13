@@ -1,8 +1,8 @@
-name: "dbt_snow_mask_integration_tests"
-version: "1.0"
+name: 'dbt_snow_mask_integration_tests'
+version: '1.0'
 config-version: 2
 
-profile: "dbt-snow-utils-integration-tests"
+profile: 'dbt-snow-utils-integration-tests'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -12,14 +12,14 @@ macro-paths: ["macros"]
 
 target-path: "target"
 clean-targets:
-  - "target"
-  - "dbt_packages"
-  - "logs"
+    - "target"
+    - "dbt_packages"
+    - "logs"
 
-# vars:
-#   use_common_masking_policy_db: "True"
-#   common_masking_policy_db: "DEMO_DB"
-#   common_masking_policy_schema: "COMPLIANCE"
+#vars:
+#  use_common_masking_policy_db: "True"
+#  common_masking_policy_db: "DEMO_DB"
+#  common_masking_policy_schema: "COMPLIANCE"
 
 #   use_common_masking_policy_schema_only: "True"
 #   common_masking_policy_schema: "COMPLIANCE"
@@ -32,10 +32,10 @@ seeds:
 models:
   pre-hook:
     - "{{ dbt_snow_mask.create_masking_policy('models')}}"
-  post-hook:
+  post-hook: 
     - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
-    # - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
-
+#    - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
+  
   dbt_snow_mask_integration_tests:
     staging:
       database: "DEMO_DB"
