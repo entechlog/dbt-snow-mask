@@ -65,7 +65,7 @@ vars:
 
 **Method 2 : Use a common schema (in the current database)**
 
-To change only the schema (so that a common schema is used for the masking policy in the same database that your model is being deployed to) set the following parameters:
+To change only the schema (so that a common masking policy schema is used in the same database as your model) set the following parameters:
 * `use_common_masking_policy_schema_only` (optional): Flag to enable the usage of a common schema in the current database for all masking policies. Valid values are “True” OR "False"
 * `common_masking_policy_schema` (optional): The schema name for creating masking policies
 
