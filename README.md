@@ -79,6 +79,18 @@ vars:
 
 > ✅ If both `use_common_masking_policy_db` and `use_common_masking_policy_schema_only` are set to True, then `use_common_masking_policy_db` will supercede `use_common_masking_policy_schema_only`.
 
+**Allow Custom Materializations**
+
+To enable dbt_snow_mask to apply masking policies to models using custom materializations, configure the following parameter:
+* `custom_materializations_map` (optional): A dictionary containing key-value pairs mapping custom materializations (by name) to tables or views (reflecting the resulting object in Snowflake.) For each pair, the key must be the name of the custom_materialization and the value must be either `table` or `view` 
+
+**Example** : var block in dbt_project.yml to enable application of masking policies to a model generated using a custom materialiazition that ends up as a table in Snowflake.
+
+```yaml
+vars:
+  custom_materializations_map: '{ "custom_incremental": "table" }'
+```
+
 # How to apply masking policy ?
 
 - Masking is controlled by [meta](https://docs.getdbt.com/reference/resource-properties/meta) in [dbt resource properties](https://docs.getdbt.com/reference/declaring-properties) for sources and models. 

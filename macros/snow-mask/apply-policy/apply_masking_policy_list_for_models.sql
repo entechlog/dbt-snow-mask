@@ -6,10 +6,14 @@
         {% set alias    = model.alias %}    
         {% set database = model.database %}
         {% set schema   = model.schema %}
-        {% set materialization = model.config.get("materialized") %}
-        {% if materialization == "incremental" %}
-            {% set materialization = "table" %}
+        {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
+
+        {# Append custom materializations to the list of standard materializations  #}
+        {% if (var('custom_materializations_map', None) != None ) %}
+            {% do materialization_map.update(fromjson(var('custom_materializations_map'))) %}
         {% endif %}
+
+        {% set materialization = materialization_map[model.config.get("materialized")] %}
         {% set meta_columns = dbt_snow_mask.get_meta_objects(model_id,meta_key) %}
 
         {% set masking_policy_db = model.database %}
@@ -63,10 +67,14 @@
             {% set schema   = node.schema | string %}
             {% set node_unique_id = node.unique_id | string %}
             {% set node_resource_type = node.resource_type | string %}
-            {% set materialization = node.config.materialized | string %}
-            {% if materialization == "incremental" %}
-                {% set materialization = "table" %}
+            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
+
+            {# Append custom materializations to the list of standard materializations  #}
+            {% if (var('custom_materializations_map', None) != None ) %}
+                {% do materialization_map.update(fromjson(var('custom_materializations_map'))) %}
             {% endif %}
+
+            {% set materialization = materialization_map[model.config.get("materialized")] %}
             {% set alias    = node.alias %}
 
             {% set meta_columns = dbt_snow_mask.get_meta_objects(node_unique_id,meta_key,node_resource_type) %}
