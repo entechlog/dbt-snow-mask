@@ -9,9 +9,7 @@
         {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
 
         {# Append custom materializations to the list of standard materializations  #}
-        {% if (var('custom_materializations_map', None) != None ) %}
-            {% do materialization_map.update(fromjson(var('custom_materializations_map'))) %}
-        {% endif %}
+        {% do materialization_map.update(fromjson(var('custom_materializations_map', '{}'))) %}
 
         {% set materialization = materialization_map[model.config.get("materialized")] %}
         {% set meta_columns = dbt_snow_mask.get_meta_objects(model_id,meta_key) %}
@@ -70,9 +68,7 @@
             {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
 
             {# Append custom materializations to the list of standard materializations  #}
-            {% if (var('custom_materializations_map', None) != None ) %}
-                {% do materialization_map.update(fromjson(var('custom_materializations_map'))) %}
-            {% endif %}
+            {% do materialization_map.update(fromjson(var('custom_materializations_map', '{}'))) %}
 
             {% set materialization = materialization_map[model.config.get("materialized")] %}
             {% set alias    = node.alias %}
