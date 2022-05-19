@@ -6,6 +6,8 @@
         {% set alias    = model.alias %}    
         {% set database = model.database %}
         {% set schema   = model.schema %}
+
+        {# This dictionary stores a mapping between materializations in dbt and the objects they will generate in Snowflake  #}
         {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
 
         {# Append custom materializations to the list of standard materializations  #}

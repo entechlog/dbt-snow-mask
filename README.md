@@ -81,8 +81,8 @@ vars:
 
 **Allow Custom Materializations**
 
-To enable dbt_snow_mask to apply masking policies to models using custom materializations, configure the following parameter:
-* `custom_materializations_map` (optional): A dictionary containing key-value pairs mapping custom materializations (by name) to tables or views (reflecting the resulting object in Snowflake.) For each pair, the key must be the name of the custom_materialization and the value must be either `table` or `view` 
+To enable dbt_snow_mask to apply masking policies to models generated from custom materializations in dbt, configure the following parameter:
+* `custom_materializations_map` (optional): A dictionary containing key-value pairs mapping custom materializations in dbt to the objects they generate in Snowflake. For each pair, the key must be the name of the custom_materialization and the value must be either `table` or `view`. 
 
 **Example** : var block in dbt_project.yml to enable application of masking policies to a model generated using a custom materialiazition that ends up as a table in Snowflake.
 
