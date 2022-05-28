@@ -23,10 +23,17 @@
         {% set masking_policy_db = node.database %}
         {% set masking_policy_schema = node.schema %}
 		
-        {# Override the database and schema name when use common_masking_policy_db flag is set #}
-        {%- if (var('use_common_masking_policy_db', 'False')|upper == 'TRUE') or (var('use_common_masking_policy_db', 'False')|upper == 'YES') -%}
-            {% if var('common_masking_policy_db') and var('common_masking_policy_schema') %}
+        {# Override the database and schema name when use_common_masking_policy_db flag is set #}
+        {%- if (var('use_common_masking_policy_db', 'False')|upper in ['TRUE','YES']) -%}
+            {% if (var('common_masking_policy_db') and var('common_masking_policy_schema')) %}
                 {% set masking_policy_db = var('common_masking_policy_db') | string  %}
+                {% set masking_policy_schema = var('common_masking_policy_schema') | string  %}
+            {% endif %}
+        {% endif %}
+
+        {# Override the schema name (in the masking_policy_db) when use_common_masking_policy_schema_only flag is set #}
+        {%- if (var('use_common_masking_policy_schema_only', 'False')|upper in ['TRUE','YES']) and (var('use_common_masking_policy_db', 'False')|upper in ['FALSE','NO']) -%}
+            {% if var('common_masking_policy_schema') %}
                 {% set masking_policy_schema = var('common_masking_policy_schema') | string  %}
             {% endif %}
         {% endif %}

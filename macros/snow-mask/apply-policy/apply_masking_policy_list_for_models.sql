@@ -6,19 +6,30 @@
         {% set alias    = model.alias %}    
         {% set database = model.database %}
         {% set schema   = model.schema %}
-        {% set materialization = model.config.get("materialized") %}
-        {% if materialization == "incremental" %}
-            {% set materialization = "table" %}
-        {% endif %}
+
+        {# This dictionary stores a mapping between materializations in dbt and the objects they will generate in Snowflake  #}
+        {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
+
+        {# Append custom materializations to the list of standard materializations  #}
+        {% do materialization_map.update(fromjson(var('custom_materializations_map', '{}'))) %}
+
+        {% set materialization = materialization_map[model.config.get("materialized")] %}
         {% set meta_columns = dbt_snow_mask.get_meta_objects(model_id,meta_key) %}
 
         {% set masking_policy_db = model.database %}
         {% set masking_policy_schema = model.schema %}
 		
-        {# Override the database and schema name when use common_masking_policy_db flag is set #}
-        {%- if (var('use_common_masking_policy_db', 'False')|upper == 'TRUE') or (var('use_common_masking_policy_db', 'False')|upper == 'YES') -%}
-            {% if var('common_masking_policy_db') and var('common_masking_policy_schema') %}
+        {# Override the database and schema name when use_common_masking_policy_db flag is set #}
+        {%- if (var('use_common_masking_policy_db', 'False')|upper in ['TRUE','YES']) -%}
+            {% if (var('common_masking_policy_db') and var('common_masking_policy_schema')) %}
                 {% set masking_policy_db = var('common_masking_policy_db') | string  %}
+                {% set masking_policy_schema = var('common_masking_policy_schema') | string  %}
+            {% endif %}
+        {% endif %}
+
+        {# Override the schema name (in the masking_policy_db) when use_common_masking_policy_schema_only flag is set #}
+        {%- if (var('use_common_masking_policy_schema_only', 'False')|upper in ['TRUE','YES']) and (var('use_common_masking_policy_db', 'False')|upper in ['FALSE','NO']) -%}
+            {% if var('common_masking_policy_schema') %}
                 {% set masking_policy_schema = var('common_masking_policy_schema') | string  %}
             {% endif %}
         {% endif %}
@@ -39,7 +50,7 @@
                     {% if masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
                         {{ log(modules.datetime.datetime.now().strftime("%H:%M:%S") ~ " | " ~ operation_type ~ "ing masking policy to model  : " ~ masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column, info=True) }}
                         {% set query %}
-                        alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{column}} set masking policy  {{masking_policy_db}}.{{masking_policy_schema}}.{{masking_policy_name}};
+                        alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{column}} set masking policy {{masking_policy_db}}.{{masking_policy_schema}}.{{masking_policy_name}};
                         {% endset %}
                         {% do run_query(query) %}
                     {% endif %}
@@ -56,10 +67,12 @@
             {% set schema   = node.schema | string %}
             {% set node_unique_id = node.unique_id | string %}
             {% set node_resource_type = node.resource_type | string %}
-            {% set materialization = node.config.materialized | string %}
-            {% if materialization == "incremental" %}
-                {% set materialization = "table" %}
-            {% endif %}
+            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
+
+            {# Append custom materializations to the list of standard materializations  #}
+            {% do materialization_map.update(fromjson(var('custom_materializations_map', '{}'))) %}
+
+            {% set materialization = materialization_map[model.config.get("materialized")] %}
             {% set alias    = node.alias %}
 
             {% set meta_columns = dbt_snow_mask.get_meta_objects(node_unique_id,meta_key,node_resource_type) %}

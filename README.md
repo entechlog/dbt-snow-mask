@@ -46,19 +46,49 @@ This dbt package contains macros that can be (re)used across dbt projects with s
 
 # How to configure database and schema for the masking policy ?
 
-By default this process creates the masking policies in same directory as the database objects. You can change this default behavior by using following parameters in your `dbt_project.yml` 
+By default this process creates the masking policies in same directory as the database objects. There are 2 methods for changing the default behavior by using the following parameters in your `dbt_project.yml` 
 
+**Method 1 : Use a common database**
+
+To change the database that your masking polices are created in set the following parameters:
 * `use_common_masking_policy_db` (optional): Flag to enable the usage of a common db/schema for all masking policies. Valid values are “True” OR "False"
 * `common_masking_policy_db` (optional): The database name for creating masking policies
 * `common_masking_policy_schema` (optional): The schema name for creating masking policies
 
-**Example** : var block in dbt_project.yml
-
+**Example** : var block in dbt_project.yml to enable using a common masking policy database
 ```yaml
 vars:
   use_common_masking_policy_db: "True"
   common_masking_policy_db: "DEMO_DB"
   common_masking_policy_schema: "COMPLIANCE"
+```
+
+**Method 2 : Use a common schema (in the current database)**
+
+To change only the schema (so that a common masking policy schema is used in the same database as your model) set the following parameters:
+* `use_common_masking_policy_schema_only` (optional): Flag to enable the usage of a common schema in the current database for all masking policies. Valid values are “True” OR "False"
+* `common_masking_policy_schema` (optional): The schema name for creating masking policies
+
+**Example** : var block in dbt_project.yml to enable using a common masking policy schema (in the current database)
+
+```yaml
+vars:
+  use_common_masking_policy_schema_only: "True"
+  common_masking_policy_schema: "COMPLIANCE"
+```
+
+> ✅ If both `use_common_masking_policy_db` and `use_common_masking_policy_schema_only` are set to True, then `use_common_masking_policy_db` will supercede `use_common_masking_policy_schema_only`.
+
+**Allow Custom Materializations**
+
+To enable dbt_snow_mask to apply masking policies to models generated from custom materializations in dbt, configure the following parameter:
+* `custom_materializations_map` (optional): A dictionary containing key-value pairs mapping custom materializations in dbt to the objects they generate in Snowflake. For each pair, the key must be the name of the custom_materialization and the value must be either `table` or `view`. 
+
+**Example** : var block in dbt_project.yml to enable application of masking policies to a model generated using a custom materialiazition that ends up as a table in Snowflake.
+
+```yaml
+vars:
+  custom_materializations_map: '{ "custom_incremental": "table" }'
 ```
 
 # How to apply masking policy ?
