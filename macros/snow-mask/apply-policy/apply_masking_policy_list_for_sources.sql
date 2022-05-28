@@ -43,12 +43,16 @@
             select $3||'.'||$4||'.'||$2 as masking_policy from table(result_scan(last_query_id()));
         {% endset %}
 
+        {# If there are some masking policies to be applied in this model, we should show the masking policies in the schema #}
+        {% if meta_columns | length > 0 %}
+            {% set masking_policy_list = dbt_utils.get_query_results_as_dict(masking_policy_list_sql) %}
+        {% endif %}
+
         {%- for meta_tuple in meta_columns if meta_columns | length > 0 %}
             {% set column   = meta_tuple[0] %}
             {% set masking_policy_name  = meta_tuple[1] %}
 
             {% if masking_policy_name is not none %}
-                {% set masking_policy_list = dbt_utils.get_query_results_as_dict(masking_policy_list_sql) %}
 
                 {% for masking_policy_in_db in masking_policy_list['MASKING_POLICY'] %}
                     {% if masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
