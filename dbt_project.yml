@@ -11,5 +11,6 @@ log-path: "logs"
 
 vars:
   use_common_masking_policy_db: "False"
+  create_masking_policy_schema: "True"
   common_masking_policy_db: 
   common_masking_policy_schema: 
