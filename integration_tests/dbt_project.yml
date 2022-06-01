@@ -20,6 +20,7 @@ clean-targets:
 #  use_common_masking_policy_db: "True"
 #  common_masking_policy_db: "DEMO_DB"
 #  common_masking_policy_schema: "COMPLIANCE"
+#  create_masking_policy_schema: "False"
 
 #   use_common_masking_policy_schema_only: "True"
 #   common_masking_policy_schema: "COMPLIANCE"

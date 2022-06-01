@@ -31,8 +31,12 @@
         {% endif %}
 
         {% set current_policy_name = masking_policy[2] | string  %}
- 
-        {% do adapter.create_schema(api.Relation.create(database=masking_policy_db, schema=masking_policy_schema)) %}
+
+        {%- if (var('use_common_masking_policy_db', 'False')|upper in ['TRUE','YES']) -%}
+            {%- if (var('create_masking_policy_schema', 'True')|upper in ['TRUE','YES']) -%}
+                {% do adapter.create_schema(api.Relation.create(database=masking_policy_db, schema=masking_policy_schema)) %}
+            {% endif %}
+        {% endif %}
 
         {% set call_masking_policy_macro = context["create_masking_policy_" | string ~ current_policy_name | string]  %}
         {% set result = run_query(call_masking_policy_macro(masking_policy_db, masking_policy_schema)) %}

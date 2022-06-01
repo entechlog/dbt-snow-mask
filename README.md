@@ -11,6 +11,7 @@
 - [Credits](#credits)
 - [References](#references)
 - [Contributions](#contributions)
+- [How to do an integration test ?](#how-to-do-an-integration-test-)
 
 # Overview
 This dbt package contains macros that can be (re)used across dbt projects with snowflake. `dbt_snow_mask` will help to apply [Dynamic Data Masking](https://docs.snowflake.com/en/user-guide/security-column-ddm-use.html) using [dbt meta](https://docs.getdbt.com/reference/resource-properties/meta).
@@ -54,6 +55,7 @@ To change the database that your masking polices are created in set the followin
 * `use_common_masking_policy_db` (optional): Flag to enable the usage of a common db/schema for all masking policies. Valid values are “True” OR "False"
 * `common_masking_policy_db` (optional): The database name for creating masking policies
 * `common_masking_policy_schema` (optional): The schema name for creating masking policies
+* `create_masking_policy_schema` (optional): Valid values are “True” OR "False". The default value is “True”. When set to "False", helps to avoid creating schema if the dbt role does not have access to create schema
 
 **Example** : var block in dbt_project.yml to enable using a common masking policy database
 ```yaml
@@ -68,7 +70,8 @@ vars:
 To change only the schema (so that a common masking policy schema is used in the same database as your model) set the following parameters:
 * `use_common_masking_policy_schema_only` (optional): Flag to enable the usage of a common schema in the current database for all masking policies. Valid values are “True” OR "False"
 * `common_masking_policy_schema` (optional): The schema name for creating masking policies
-
+* `create_masking_policy_schema` (optional): Valid values are “True” OR "False". The default value is “True”. When set to "False", helps to avoid creating schema if the dbt role does not have access to create schema
+  
 **Example** : var block in dbt_project.yml to enable using a common masking policy schema (in the current database)
 
 ```yaml
@@ -142,10 +145,10 @@ vars:
 
 - Create the masking policies by running below command  
   
-  | Resource Type | Command                                                                         |
-  | ------------- | ------------------------------------------------------------------------------- |
-  | sources       | `dbt run-operation create_masking_policy --args '{"resource_type": "sources"}'` |
-  | models        | `dbt run-operation create_masking_policy --args '{"resource_type": "models"}'`  |
+| Resource Type | Command                                                                         |
+| ------------- | ------------------------------------------------------------------------------- |
+| sources       | `dbt run-operation create_masking_policy --args '{"resource_type": "sources"}'` |
+| models        | `dbt run-operation create_masking_policy --args '{"resource_type": "models"}'`  |
 
 - Alternatively, you can also create the masking policies by specifying `pre-hook` OR `on-run-start` in your `dbt_project.yml`
   
@@ -157,10 +160,10 @@ vars:
 
 - Apply the masking policy by running below commands  
 
-  | Resource Type | Command                                                                        |
-  | ------------- | ------------------------------------------------------------------------------ |
-  | sources       | `dbt run-operation apply_masking_policy --args '{"resource_type": "sources"}'` |
-  | models        | `dbt run -- model <model-name>`                                                |
+| Resource Type | Command                                                                        |
+| ------------- | ------------------------------------------------------------------------------ |
+| sources       | `dbt run-operation apply_masking_policy --args '{"resource_type": "sources"}'` |
+| models        | `dbt run -- model <model-name>`                                                |
 
 - Alternatively, you can also apply the masking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
   
@@ -176,10 +179,10 @@ vars:
 
 - Remove the masking policy applied by this package by running below commands  
 
-  | Resource Type | Command                                                                          |
-  | ------------- | -------------------------------------------------------------------------------- |
-  | sources       | `dbt run-operation unapply_masking_policy --args '{"resource_type": "sources"}'` |
-  | models        | `dbt run-operation unapply_masking_policy --args '{"resource_type": "models"}'`  |
+| Resource Type | Command                                                                          |
+| ------------- | -------------------------------------------------------------------------------- |
+| sources       | `dbt run-operation unapply_masking_policy --args '{"resource_type": "sources"}'` |
+| models        | `dbt run-operation unapply_masking_policy --args '{"resource_type": "models"}'`  |
 
 - Alternatively, you can also apply the unmasking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
   
@@ -246,3 +249,10 @@ This package was created using examples from [Serge](https://www.linkedin.com/in
 
 # Contributions
 Contributions to this package are welcomed. Please create issues for bugs or feature requests for enhancement ideas or PRs for any enhancement contributions.
+
+# How to do an integration test ?
+- This is applicable only to contributors
+- cd into `dbt-snow-mask/integration_tests`
+- Run `dbt deps`
+- Run `dbt seed`
+- Adjust the vars in `integration_tests\dbt_project.yml` and run `dbt run` 
