@@ -1,5 +1,7 @@
 {% macro apply_masking_policy_list_for_sources(meta_key,operation_type="apply") %}
 
+{% if execute %}
+
     {% for node in graph.sources.values() -%}
 
         {% set database = node.database | string %}
@@ -72,5 +74,7 @@
         {% endfor %}
 
     {% endfor %}
+
+{% endif %}
 
 {% endmacro %}
