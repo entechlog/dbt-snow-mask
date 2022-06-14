@@ -238,7 +238,7 @@ vars:
   ```yaml
   models:
     post-hook: 
-      - "{{ dbt_snow_mask.unapply_masking_policy('models',mymodel) }}"
+      - "{{ dbt_snow_mask.unapply_masking_policy('models','mymodel') }}"
   ```
 
 # How to validate masking policy ?
