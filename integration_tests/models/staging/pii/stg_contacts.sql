@@ -8,7 +8,7 @@ WITH contacts AS (
         ip_address,
         ssn,phone
 
-    FROM {{ ref('hipaa_contact') }}
+    FROM {{ ref('contact') }}
 ),
 
 final AS (

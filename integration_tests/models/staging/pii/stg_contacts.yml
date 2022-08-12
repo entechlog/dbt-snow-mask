@@ -1,7 +1,7 @@
 version: 2
 
 models:
-- name: contacts
+- name: stg_contacts
   description: ""
   columns:
   - name: contact_id
