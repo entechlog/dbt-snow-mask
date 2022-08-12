@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: raw_sakila
+  - name: seeds
     tables:
       - name: customer
         columns:

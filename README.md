@@ -246,6 +246,8 @@ This package was created using examples from [Serge](https://www.linkedin.com/in
 # References
 - https://docs.snowflake.com/en/user-guide/security-column-ddm-intro.html
 - https://getdbt.slack.com/archives/CJN7XRF1B/p1609177817234800
+- https://docs.snowflake.com/en/sql-reference/functions/policy_references.html
+- https://docs.snowflake.com/en/user-guide/security-column-ddm-use.html
 
 # Contributions
 Contributions to this package are welcomed. Please create issues for bugs or feature requests for enhancement ideas or PRs for any enhancement contributions.

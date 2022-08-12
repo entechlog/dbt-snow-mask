@@ -27,8 +27,7 @@ clean-targets:
 
 seeds:
   dbt_snow_mask_integration_tests:
-    sakila:
-      schema: raw_sakila
+    +schema: seeds
 
 models:
   pre-hook:
@@ -39,7 +38,7 @@ models:
   
   dbt_snow_mask_integration_tests:
     staging:
-      database: "DEV_ENTECHLOG_RAW_DB"
+      database: "DEV_ENTECHLOG_DEMO_DB"
       schema: staging
 
 on-run-start:
