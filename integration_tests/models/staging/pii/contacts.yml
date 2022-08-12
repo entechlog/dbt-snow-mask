@@ -1,0 +1,27 @@
+version: 2
+
+models:
+- name: contacts
+  description: ""
+  columns:
+  - name: contact_id
+    description: ""
+  - name: first_name
+    description: ""
+  - name: last_name
+    description: ""
+  - name: email
+    description: "Email Address"
+    meta:
+      masking_policy: mp_email
+  - name: gender
+    description: ""
+
+  - name: ip_address
+    description: ""
+
+  - name: ssn
+    description: ""
+
+  - name: phone
+    description: ""

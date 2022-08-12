@@ -4,4 +4,4 @@
     )
 }}
 
-SELECT * FROM {{ source('raw_sakila', 'customer') }}
+SELECT * FROM {{ source('seeds', 'customer') }}
