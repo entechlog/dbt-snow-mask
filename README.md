@@ -164,34 +164,51 @@ vars:
 | ------------- | ------------------------------------------------------------------------------ |
 | sources       | `dbt run-operation apply_masking_policy --args '{"resource_type": "sources"}'` |
 | models        | `dbt run -- model <model-name>`                                                |
+| snapshots     | `dbt snapshot --select <snapshot-name> --target <target-name>`                 |
 
 - Alternatively, you can also apply the masking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
   
   **Example** : dbt_project.yml
 
+(For models)
   ```yaml
   models:
     post-hook: 
       - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
+  ```
+  
+  (For snapshots)  
+  ```yaml
+  snapshots:
+    post-hook: 
+      - "{{ dbt_snow_mask.apply_masking_policy('snapshots') }}"
   ```
 
 # How to remove masking policy ?
 
 - Remove the masking policy applied by this package by running below commands  
 
-| Resource Type | Command                                                                          |
-| ------------- | -------------------------------------------------------------------------------- |
-| sources       | `dbt run-operation unapply_masking_policy --args '{"resource_type": "sources"}'` |
-| models        | `dbt run-operation unapply_masking_policy --args '{"resource_type": "models"}'`  |
+| Resource Type | Command                                                                             |
+| ------------- | ----------------------------------------------------------------------------------- |
+| sources       | `dbt run-operation unapply_masking_policy --args '{"resource_type": "sources"}'`    |
+| models        | `dbt run-operation unapply_masking_policy --args '{"resource_type": "models"}'`     |
+| snapshots     | `dbt run-operation unapply_masking_policy --args '{"resource_type": "snapshots "}'` |
 
 - Alternatively, you can also apply the unmasking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
   
   **Example** : dbt_project.yml
 
+(For models)
   ```yaml
   models:
     post-hook: 
       - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
+  ```
+(For snapshots)
+```yaml
+  snapshots:
+    post-hook: 
+      - "{{ dbt_snow_mask.unapply_masking_policy('snapshots') }}"
   ```
 
 # How to validate masking policy ?

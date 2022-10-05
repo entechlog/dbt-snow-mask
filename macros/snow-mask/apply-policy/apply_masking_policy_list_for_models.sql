@@ -10,10 +10,10 @@
         {% set schema   = model.schema %}
         {% set model_resource_type = model.resource_type | string %}
 
-        {% if model_resource_type|lower in ["model"] %}
+        {% if model_resource_type|lower in ["model", "snapshot"] %}
 
             {# This dictionary stores a mapping between materializations in dbt and the objects they will generate in Snowflake  #}
-            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
+            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table", "snapshot": "table"} %}
 
             {# Append custom materializations to the list of standard materializations  #}
             {% do materialization_map.update(fromjson(var('custom_materializations_map', '{}'))) %}
@@ -77,9 +77,9 @@
             {% set schema   = node.schema | string %}
             {% set node_unique_id = node.unique_id | string %}
             {% set node_resource_type = node.resource_type | string %}
-            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table"} %}
+            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table", "snapshot": "table"} %}
 
-            {% if node_resource_type|lower in ["model"] %}
+            {% if node_resource_type|lower in ["model", "snapshot"] %}
 
                 {# Append custom materializations to the list of standard materializations  #}
                 {% do materialization_map.update(fromjson(var('custom_materializations_map', '{}'))) %}
