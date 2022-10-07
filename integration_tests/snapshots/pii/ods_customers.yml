@@ -1,0 +1,8 @@
+version: 2
+
+snapshots:
+  - name: ods_customers
+    columns:
+      - name: email
+        meta:
+          masking_policy: mp_encrypt_pii
