@@ -9,6 +9,7 @@ analysis-paths: ["analyses"]
 test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
 
 target-path: "target"
 clean-targets:
@@ -35,6 +36,10 @@ models:
   post-hook: 
     - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
 #    - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
+
+snapshots:
+  post-hook: 
+    - "{{ dbt_snow_mask.apply_masking_policy('snapshots') }}"
   
   dbt_snow_mask_integration_tests:
     staging:
