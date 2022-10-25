@@ -124,6 +124,14 @@ vars:
             masking_policy: mp_encrypt_pii
   ```
 
+- Decide you force applying masking policy to avoid unsetting them before re-applying again - it helps to remove handy stuff whenever the masking policy definition is relocated to another database/schema:
+  **Example** : var block in dbt_project.yml to enable using force
+
+```yaml
+vars:
+  use_force_applying_masking_policy: "True"
+```
+
 - Create a new `.sql` file with the name `create_masking_policy_<masking-policy-name-from-meta>.sql` and the sql for masking policy definition. Its important for macro to follow this naming standard.
   
   **Example** : create_masking_policy_mp_encrypt_pii.sql
