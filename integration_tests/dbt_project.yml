@@ -17,7 +17,7 @@ clean-targets:
     - "dbt_packages"
     - "logs"
 
-vars:
+#vars:
 #  use_force_applying_masking_policy: "True"
 #  use_common_masking_policy_db: "True"
 #  common_masking_policy_db: "DEMO_DB"
