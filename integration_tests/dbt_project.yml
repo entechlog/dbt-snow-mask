@@ -18,6 +18,7 @@ clean-targets:
     - "logs"
 
 #vars:
+#  use_force_applying_masking_policy: "True"
 #  use_common_masking_policy_db: "True"
 #  common_masking_policy_db: "DEMO_DB"
 #  common_masking_policy_schema: "COMPLIANCE"
@@ -42,7 +43,7 @@ snapshots:
     - "{{ dbt_snow_mask.apply_masking_policy('snapshots') }}"
   
   dbt_snow_mask_integration_tests:
-    staging:
+    pii:
       database: "DEV_ENTECHLOG_DEMO_DB"
       schema: staging
 
