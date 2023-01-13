@@ -5,11 +5,11 @@
     {% if operation_type == "apply" %}
         {% for node in graph.nodes.values() %}
             {%- if resource_name in node.path  -%}            
-                {% set model_id = model.unique_id | string %}
-                {% set alias    = model.alias %}    
-                {% set database = model.database %}
-                {% set schema   = model.schema %}
-                {% set model_resource_type = model.resource_type | string %}
+                {% set model_id = node.unique_id | string %}
+                {% set alias    = node.alias %}    
+                {% set database = node.database %}
+                {% set schema   = node.schema %}
+                {% set model_resource_type = node.resource_type | string %}
 
                 {% if model_resource_type|lower in ["model"] %}
 
@@ -19,11 +19,11 @@
                     {# Append custom materializations to the list of standard materializations  #}
                     {% do materialization_map.update(fromjson(var('custom_materializations_map', '{}'))) %}
 
-                    {% set materialization = materialization_map[model.config.get("materialized")] %}
+                    {% set materialization = materialization_map[node.config.get("materialized")] %}
                     {% set meta_columns = dbt_snow_mask.get_meta_objects(model_id,meta_key) %}
 
-                    {% set masking_policy_db = model.database %}
-                    {% set masking_policy_schema = model.schema %}
+                    {% set masking_policy_db = node.database %}
+                    {% set masking_policy_schema = node.schema %}
                     
                     {# Override the database and schema name when use_common_masking_policy_db flag is set #}
                     {%- if (var('use_common_masking_policy_db', 'False')|upper in ['TRUE','YES']) -%}
