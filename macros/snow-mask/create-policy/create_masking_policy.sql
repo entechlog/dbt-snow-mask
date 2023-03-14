@@ -30,14 +30,19 @@
             {% endif %}
         {% endif %}
 
-        {% set current_policy_name = masking_policy[2] | string  %}
+        {% set current_policy_name          = masking_policy[2] | string  %}
+        {% set conditionally_masked_column  = masking_policy[3] %}
 
         {%- if (var('create_masking_policy_schema', 'True')|upper in ['TRUE','YES']) -%}
             {% do adapter.create_schema(api.Relation.create(database=masking_policy_db, schema=masking_policy_schema)) %}
         {% endif %}
 
         {% set call_masking_policy_macro = context["create_masking_policy_" | string ~ current_policy_name | string]  %}
-        {% set result = run_query(call_masking_policy_macro(masking_policy_db, masking_policy_schema)) %}
+        {% if conditionally_masked_column is not none %}
+            {% set result = run_query(call_masking_policy_macro(masking_policy_db, masking_policy_schema, conditionally_masked_column)) %}
+        {% else %}
+            {% set result = run_query(call_masking_policy_macro(masking_policy_db, masking_policy_schema)) %}
+        {% endif %}
     {% endfor %}
 
 {% endif %}
