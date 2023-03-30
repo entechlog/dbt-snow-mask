@@ -6,3 +6,6 @@ snapshots:
       - name: email
         meta:
           masking_policy: mp_encrypt_pii
+      - name: create_date
+        meta:
+          masking_policy: mp_mask_timestamp
