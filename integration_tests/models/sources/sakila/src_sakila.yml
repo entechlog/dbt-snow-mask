@@ -7,4 +7,7 @@ sources:
         columns:
           - name: first_name
             meta:
-                masking_policy: mp_encrypt_pii
+              masking_policy: mp_conditional_customer_pii
+              mp_conditional_columns: 
+                - store_id 
+                - active
