@@ -35,7 +35,7 @@ models:
   pre-hook:
     - "{{ dbt_snow_mask.create_masking_policy('models')}}"
   post-hook: 
-    - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
+#    - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
 #    - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
 
 snapshots:

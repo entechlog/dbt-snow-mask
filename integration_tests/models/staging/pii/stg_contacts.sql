@@ -1,3 +1,5 @@
+{{ config(post_hook = "{{ dbt_snow_mask.apply_masking_policy('models') }}") }}
+
 WITH contacts AS (
     SELECT
         contact_id,
