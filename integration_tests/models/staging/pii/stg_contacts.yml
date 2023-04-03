@@ -12,6 +12,7 @@ models:
           masking_policy: mp_conditional_contacts_pii
           mp_conditional_columns: 
             - last_name 
+            
       - name: last_name
         description: ""
       - name: email
@@ -23,6 +24,8 @@ models:
 
       - name: ip_address
         description: ""
+        meta:
+          masking_policy: mp_ip
 
       - name: ssn
         description: ""

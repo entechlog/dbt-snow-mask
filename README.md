@@ -192,6 +192,12 @@ vars:
       - "{{ dbt_snow_mask.apply_masking_policy('snapshots') }}"
   ```
 
+- If you prefer to add this directly to a dbt model, see below command for an correct example
+  
+  ```yaml
+  {{ config(post_hook = "{{ dbt_snow_mask.apply_masking_policy('models') }}") }}
+  ```
+
 # How to remove masking policy ?
 
 - Remove the masking policy applied by this package by running below commands  
