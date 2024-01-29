@@ -3,9 +3,9 @@
 {% if execute %}
 
     {% if operation_type == "apply" %}
-    
+
         {% set model_id = model.unique_id | string %}
-        {% set alias    = model.alias %}    
+        {% set alias    = model.alias %}
         {% set database = model.database %}
         {% set schema   = model.schema %}
         {% set model_resource_type = model.resource_type | string %}
@@ -13,7 +13,7 @@
         {% if model_resource_type|lower in ["model", "snapshot"] %}
 
             {# This dictionary stores a mapping between materializations in dbt and the objects they will generate in Snowflake  #}
-            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table", "snapshot": "table"} %}
+            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table", "snapshot": "table", "dynamic_table": "table"} %}
 
             {# Append custom materializations to the list of standard materializations  #}
             {% do materialization_map.update(fromjson(var('custom_materializations_map', '{}'))) %}
@@ -23,7 +23,7 @@
 
             {% set masking_policy_db = model.database %}
             {% set masking_policy_schema = model.schema %}
-            
+
             {# Override the database and schema name when use_common_masking_policy_db flag is set #}
             {%- if (var('use_common_masking_policy_db', 'False')|upper in ['TRUE','YES']) -%}
                 {% if (var('common_masking_policy_db') and var('common_masking_policy_schema')) %}
@@ -39,7 +39,7 @@
                 {% endif %}
             {% endif %}
 
-            {% set masking_policy_list_sql %}     
+            {% set masking_policy_list_sql %}
                 show masking policies in {{masking_policy_db}}.{{masking_policy_schema}};
                 select $3||'.'||$4||'.'||$2 as masking_policy from table(result_scan(last_query_id()));
             {% endset %}
@@ -53,7 +53,7 @@
                 {% set column               = meta_tuple[0] %}
                 {% set masking_policy_name  = meta_tuple[1] %}
                 {% set conditional_columns  = meta_tuple[2] %}
-                
+
                 {% if masking_policy_name is not none %}
 
                     {% for masking_policy_in_db in masking_policy_list['MASKING_POLICY'] %}
@@ -72,7 +72,7 @@
             {% endfor %}
 
         {% endif %}
-    
+
     {% elif operation_type == "unapply" %}
 
         {% for node in graph.nodes.values() -%}
@@ -81,7 +81,7 @@
             {% set schema   = node.schema | string %}
             {% set node_unique_id = node.unique_id | string %}
             {% set node_resource_type = node.resource_type | string %}
-            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table", "snapshot": "table"} %}
+            {% set materialization_map = {"table": "table", "view": "view", "incremental": "table", "snapshot": "table", "dynamic_table": "table"} %}
 
             {% if node_resource_type|lower in ["model", "snapshot"] %}
 
@@ -104,7 +104,7 @@
                         {% endset %}
                         {% do run_query(query) %}
                     {% endif %}
-                
+
                 {% endfor %}
 
             {% endif %}
