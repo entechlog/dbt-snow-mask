@@ -174,7 +174,7 @@ vars:
 | models        | `dbt run -- model <model-name>`                                                |
 | snapshots     | `dbt snapshot --select <snapshot-name> --target <target-name>`                 |
 
-- Alternatively, you can also apply the masking policies by specifying below `post-hook` OR `on-run-end` to `dbt_project.yml`
+- Alternatively, you can also apply the masking policies by specifying below `post-hook` to `dbt_project.yml`
   
   **Example** : dbt_project.yml
 
@@ -192,11 +192,16 @@ vars:
       - "{{ dbt_snow_mask.apply_masking_policy('snapshots') }}"
   ```
 
-- If you prefer to add this directly to a dbt model, see below command for an correct example
+- If you prefer to add this directly to a dbt model, see below command for a correct example
   
   ```yaml
   {{ config(post_hook = "{{ dbt_snow_mask.apply_masking_policy('models') }}") }}
   ```
+
+- Note:   ```"{{ dbt_snow_mask.apply_masking_policy('sources') }}"``` can be added to ```on-run-end```, but 
+```"{{ dbt_snow_mask.apply_masking_policy('models') }}"``` and 
+  ```"{{ dbt_snow_mask.apply_masking_policy('snapshots') }}"``` should either be included specifically as post-hooks to 
+  the models or snapshots sections of dbt_project.yml or added as a custom config to an individual model.
 
 # How to remove masking policy ?
 
