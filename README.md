@@ -98,7 +98,7 @@ vars:
 
 - Masking is controlled by [meta](https://docs.getdbt.com/reference/resource-properties/meta) in [dbt resource properties](https://docs.getdbt.com/reference/declaring-properties) for sources and models. 
 
-- Decide you masking policy name and add the key `masking_policy` in the column which has to be masked.
+- Decide your masking policy name and add the key `masking_policy` in the column which has to be masked.
   
   **Example** : source.yml
 
