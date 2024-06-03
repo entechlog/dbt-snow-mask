@@ -1,0 +1,45 @@
+name: PR Requirements
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, ready_for_review]
+
+jobs:
+  check-final-approval:
+    name: Data Eng Final Approval
+    runs-on: ubuntu-latest
+
+    # GitHub should provide a "pull_request_review_target", but they don't and
+    # the action will fail if run on a forked PR.
+    if: |
+      github.event.pull_request.head.repo.full_name ==
+      github.event.pull_request.base.repo.full_name
+
+    steps:
+      - id: 'reviews'
+        uses: 'jrylan/github-action-reviews-counter@main'
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+
+      - uses: necojackarc/auto-request-review@v0.12.0
+        # This logic will request data-platforms as a review after there has
+        # been one approved review submitted on a non-draft PR
+        if: |
+          github.event_name == 'pull_request_review' &&
+          ! github.event.pull_request.draft &&
+          github.event.review.state == 'approved' &&
+          steps.reviews.outputs.approved == 1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - uses: Automattic/action-required-review@v4
+        id: required_review
+        with:
+          token: ${{ secrets.GITHUB_TOKEN  }}
+          requirements: |
+            - name: Data Eng
+              teams:
+                - data-platforms
+          status: Data Eng Final Approval
+          fail: true
