@@ -7,7 +7,7 @@
 - [Credits](#credits)
 - [References](#references)
 
-# Overview
+# Overview1
 This dbt package contains macros that can be (re)used across dbt projects with snowflake. `dbt_snow_mask` will help to apply [Dynamic Data Masking](https://docs.snowflake.com/en/user-guide/security-column-ddm-use.html) using [dbt meta](https://docs.getdbt.com/reference/resource-properties/meta).
 
 # Installation Instructions
