@@ -51,6 +51,7 @@
 
             {%- for meta_tuple in meta_columns if meta_columns | length > 0 %}
                 {% set column               = meta_tuple[0] %}
+                {% set quoted_column = '"' ~ column ~ '"' if model.columns.get(column, {}).get('quote', false) else column %}
                 {% set masking_policy_name  = meta_tuple[1] %}
                 {% set conditional_columns  = meta_tuple[2] %}
 
@@ -62,7 +63,7 @@
                             {% set query %}
                             alter {{materialization}} {{database}}.{{schema}}.{{alias}}
                             modify column {{column}}
-                            set masking policy {{masking_policy_db}}.{{masking_policy_schema}}.{{masking_policy_name}} {% if conditional_columns | length > 0 %}using ({{column}}, {{conditional_columns|join(', ')}}){% endif %} {% if var('use_force_applying_masking_policy','False')|upper in ['TRUE','YES'] %} force {% endif %};
+                            set masking policy {{masking_policy_db}}.{{masking_policy_schema}}.{{masking_policy_name}} {% if conditional_columns | length > 0 %}using ({{quoted_column}}, {{conditional_columns|join(', ')}}){% endif %} {% if var('use_force_applying_masking_policy','False')|upper in ['TRUE','YES'] %} force {% endif %};
                             {% endset %}
                             {% do run_query(query) %}
                         {% endif %}
@@ -95,12 +96,13 @@
 
                 {%- for meta_tuple in meta_columns if meta_columns | length > 0 %}
                     {% set column   = meta_tuple[0] %}
+                    {% set quoted_column = '"' ~ column ~ '"' if node.columns.get(column, {}).get('quote', false) else column %}
                     {% set masking_policy_name  = meta_tuple[1] %}
 
                     {% if masking_policy_name is not none %}
                         {{ log(modules.datetime.datetime.now().strftime("%H:%M:%S") ~ " | " ~ operation_type ~ "ing masking policy to model  : " ~ database|upper ~ '.' ~ schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column, info=True) }}
                         {% set query %}
-                            alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{column}} unset masking policy
+                            alter {{materialization}}  {{database}}.{{schema}}.{{alias}} modify column  {{quoted_column }} unset masking policy
                         {% endset %}
                         {% do run_query(query) %}
                     {% endif %}
