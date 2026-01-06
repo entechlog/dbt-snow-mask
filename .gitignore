@@ -134,6 +134,7 @@ dbt_modules/
 logs/
 profiles.yml
 dbt_packages/
+dbt_internal_packages/
 
 # Passwords 
 *.pem

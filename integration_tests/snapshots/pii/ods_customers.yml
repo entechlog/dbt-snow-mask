@@ -4,5 +4,6 @@ snapshots:
   - name: ods_customers
     columns:
       - name: email
-        meta:
-          masking_policy: mp_encrypt_pii
+        config:
+          meta:
+            masking_policy: mp_encrypt_pii

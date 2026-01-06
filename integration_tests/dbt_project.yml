@@ -10,12 +10,10 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
-
-target-path: "target"
 clean-targets:
-    - "target"
-    - "dbt_packages"
-    - "logs"
+  - "target"
+  - "dbt_packages"
+  - "logs"
 
 #vars:
 #  use_force_applying_masking_policy: "True"
@@ -32,23 +30,23 @@ seeds:
     +schema: seeds
 
 models:
-  pre-hook:
+  +pre-hook:
     - "{{ dbt_snow_mask.create_masking_policy('models')}}"
-  post-hook: 
+  +post-hook:
 #    - "{{ dbt_snow_mask.apply_masking_policy('models') }}"
 #    - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
 
 snapshots:
-  post-hook: 
+  +post-hook:
     - "{{ dbt_snow_mask.apply_masking_policy('snapshots') }}"
-  
   dbt_snow_mask_integration_tests:
     pii:
       database: "DEV_ENTECHLOG_DEMO_DB"
-      schema: staging
-
+      +schema: staging
 on-run-start:
   - "{{ dbt_snow_mask.create_masking_policy('sources')}}"
 
 on-run-end:
   - "{{ dbt_snow_mask.apply_masking_policy('sources')}}"
+flags:
+  require_generic_test_arguments_property: true

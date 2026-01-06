@@ -8,25 +8,27 @@ models:
         description: ""
       - name: first_name
         description: ""
-        meta:
-          masking_policy: mp_conditional_contacts_pii
-          mp_conditional_columns: 
-            - last_name 
-            
+        config:
+          meta:
+            masking_policy: mp_conditional_contacts_pii
+            mp_conditional_columns:
+              - last_name
+
       - name: last_name
         description: ""
       - name: email
         description: "Email Address"
-        meta:
-          masking_policy: mp_email
+        config:
+          meta:
+            masking_policy: mp_email
       - name: gender
         description: ""
 
       - name: ip_address
         description: ""
-        meta:
-          masking_policy: mp_ip
-
+        config:
+          meta:
+            masking_policy: mp_ip
       - name: ssn
         description: ""
 

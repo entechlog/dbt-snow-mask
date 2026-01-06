@@ -109,7 +109,8 @@ vars:
         - name: customer
           columns:
             - name: first_name
-              meta:
+              config:
+                meta:
                   masking_policy: mp_encrypt_pii
   ```
   
@@ -120,8 +121,9 @@ vars:
     - name: stg_customer
       columns:
         - name: email
-          meta:
-            masking_policy: mp_encrypt_pii
+          config:
+            meta:
+              masking_policy: mp_encrypt_pii
   ```
 
 - Decide you force applying masking policy to avoid unsetting them before re-applying again - it helps to remove handy stuff whenever the masking policy definition is relocated to another database/schema:
@@ -220,13 +222,13 @@ vars:
 (For models)
   ```yaml
   models:
-    post-hook: 
+    +post-hook: 
       - "{{ dbt_snow_mask.unapply_masking_policy('models') }}"
   ```
 (For snapshots)
 ```yaml
   snapshots:
-    post-hook: 
+    +post-hook: 
       - "{{ dbt_snow_mask.unapply_masking_policy('snapshots') }}"
   ```
 
