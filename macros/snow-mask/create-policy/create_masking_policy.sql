@@ -30,6 +30,9 @@
             {% endif %}
         {% endif %}
 
+        {# Use the generate_schema_name macro to ensure we create/use the correct schema name #}
+        {% set masking_policy_schema = generate_schema_name(masking_policy_schema) %}
+
         {% set current_policy_name          = masking_policy[2] | string  %}
         {% set conditionally_masked_column  = masking_policy[3] %}
 

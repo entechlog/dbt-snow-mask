@@ -40,6 +40,9 @@
             {% endif %}
         {% endif %}
 
+        {# Use the generate_schema_name macro to ensure we create/use the correct schema name #}
+        {% set masking_policy_schema = generate_schema_name(masking_policy_schema) %}
+
         {% set masking_policy_list_sql %}
             show masking policies in {{masking_policy_db}}.{{masking_policy_schema}};
             select $3||'.'||$4||'.'||$2 as masking_policy from table(result_scan(last_query_id()));
