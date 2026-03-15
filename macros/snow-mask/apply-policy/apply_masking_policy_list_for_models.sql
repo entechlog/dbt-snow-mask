@@ -57,9 +57,13 @@
 
                 {% if masking_policy_name is not none %}
 
+                    {% set ns = namespace(policy_found=false) %}
+                    {% set expected_policy = masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper %}
+
                     {% for masking_policy_in_db in masking_policy_list['MASKING_POLICY'] %}
-                        {% if masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper == masking_policy_in_db %}
-                            {{ log(modules.datetime.datetime.now().strftime("%H:%M:%S") ~ " | " ~ operation_type ~ "ing masking policy to model  : " ~ masking_policy_db|upper ~ '.' ~ masking_policy_schema|upper ~ '.' ~ masking_policy_name|upper ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column ~ ' [force = ' ~ var('use_force_applying_masking_policy','False') ~ ']', info=True) }}
+                        {% if expected_policy == masking_policy_in_db %}
+                            {% set ns.policy_found = true %}
+                            {{ log(modules.datetime.datetime.now().strftime("%H:%M:%S") ~ " | " ~ operation_type ~ "ing masking policy to model  : " ~ expected_policy ~ " on " ~ database ~ '.' ~ schema ~ '.' ~ alias ~ '.' ~ column ~ ' [force = ' ~ var('use_force_applying_masking_policy','False') ~ ']', info=True) }}
                             {% set query %}
                             alter {{materialization}} {{database}}.{{schema}}.{{alias}}
                             modify column {{quoted_column}}
@@ -68,6 +72,10 @@
                             {% do run_query(query) %}
                         {% endif %}
                     {% endfor %}
+
+                    {% if not ns.policy_found %}
+                        {% do exceptions.raise_compiler_error("Masking policy " ~ expected_policy ~ " was not found in the database. Please ensure the policy exists before applying it to column " ~ column ~ " on " ~ database ~ "." ~ schema ~ "." ~ alias ~ ".") %}
+                    {% endif %}
 
                 {% endif %}
             {% endfor %}
